@@ -27,7 +27,7 @@ public class BookMapper {
     }
 
     public BookDto toDto(Book book) {
-        if (book == null) throw new IllegalArgumentException("book não pode ser nulo");;
+        if (book == null) throw new IllegalArgumentException("book não pode ser nulo");
 
         BookDto dto = new BookDto();
         dto.setTitulo(book.getTitle());

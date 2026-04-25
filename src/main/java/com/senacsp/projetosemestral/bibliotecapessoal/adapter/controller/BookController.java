@@ -35,30 +35,30 @@ public class BookController {
         return ResponseEntity.ok(catalog);
     }
 
-    @GetMapping("/{bookId}")
+    @GetMapping("/{id}")
     public ResponseEntity<BookDto> getById(
-            @PathVariable String bookId
+            @PathVariable String id
     ) {
-        BookDto book = bookService.getById(bookId);
+        BookDto book = bookService.getById(id);
 
         return ResponseEntity.ok(book);
     }
 
-    @PutMapping("/{bookId}")
+    @PutMapping("/{id}")
     public ResponseEntity<BookDto> update(
-            @PathVariable String bookId,
+            @PathVariable String id,
             @RequestBody @Valid BookDto bookDto
     ) {
-        BookDto updatedBook = bookService.updateById(bookId, bookDto);
+        BookDto updatedBook = bookService.updateById(id, bookDto);
 
         return ResponseEntity.ok(updatedBook);
     }
 
-    @DeleteMapping("/{bookId}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
-            @PathVariable String bookId
+            @PathVariable String id
     ) {
-        bookService.delete(bookId);
+        bookService.delete(id);
 
         return ResponseEntity.noContent().build();
     }
