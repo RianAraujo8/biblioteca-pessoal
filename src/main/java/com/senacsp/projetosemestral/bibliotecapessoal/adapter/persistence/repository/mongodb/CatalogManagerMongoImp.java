@@ -1,8 +1,7 @@
-package com.senacsp.projetosemestral.bibliotecapessoal.adapter.persistence;
+package com.senacsp.projetosemestral.bibliotecapessoal.adapter.persistence.repository.mongodb;
 
 import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookDto;
 import com.senacsp.projetosemestral.bibliotecapessoal.adapter.mapper.BookMapper;
-import com.senacsp.projetosemestral.bibliotecapessoal.adapter.persistence.repository.mongodb.BookMongoRepository;
 import com.senacsp.projetosemestral.bibliotecapessoal.aplication.library_data_manager.CatalogManager;
 import com.senacsp.projetosemestral.bibliotecapessoal.domain.Book;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +34,7 @@ public class CatalogManagerMongoImp implements CatalogManager {
     }
 
     @Override
-    public BookDto getDetails(String id) {
+    public BookDto getBookDetails(String id) {
         Book book = bookMongoRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("não há livros catalogados com id "+id));
 
         BookDto bookDto = bookMapper.toDto(book);

@@ -69,7 +69,7 @@ class BookServiceTest {
 
     @Test
     void shouldReturnBookById() {
-        when(catalogManager.getDetails("1"))
+        when(catalogManager.getBookDetails("1"))
                 .thenReturn(bookDto);
 
         BookDto result = bookService.getById("1");
@@ -77,7 +77,7 @@ class BookServiceTest {
         assertNotNull(result);
         assertEquals(bookDto.getTitulo(), result.getTitulo());
 
-        verify(catalogManager).getDetails("1");
+        verify(catalogManager).getBookDetails("1");
     }
 
     @Test

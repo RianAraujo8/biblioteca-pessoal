@@ -22,7 +22,7 @@ public class BookService {
     }
 
     public BookDto getById(String Id){
-        return catalogManager.getDetails(Id);
+        return catalogManager.getBookDetails(Id);
     }
 
     public BookDto updateById(String id, BookDto dto) {

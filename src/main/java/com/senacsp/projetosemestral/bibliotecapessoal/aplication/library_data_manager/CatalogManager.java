@@ -9,7 +9,7 @@ public interface CatalogManager {
 
     List<BookDto> getCatalog();
 
-    BookDto getDetails(String id);
+    BookDto getBookDetails(String id);
 
     BookDto updateInfo(String id, BookDto dto);
 
