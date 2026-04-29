@@ -7,6 +7,8 @@ import tools.jackson.databind.annotation.JsonNaming;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UserRequestDto {
 
