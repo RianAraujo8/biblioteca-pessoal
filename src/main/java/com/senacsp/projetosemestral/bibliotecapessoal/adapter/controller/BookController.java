@@ -1,6 +1,7 @@
 package com.senacsp.projetosemestral.bibliotecapessoal.adapter.controller;
 
-import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookDto;
+import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookRequestDto;
+import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookResponseDto;
 import com.senacsp.projetosemestral.bibliotecapessoal.aplication.service.BookService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +19,11 @@ public class BookController {
     private final BookService bookService;
 
     @PostMapping
-    public ResponseEntity<BookDto> register(
-            @RequestBody @Valid BookDto bookDto
+    public ResponseEntity<BookResponseDto> register(
+            @RequestBody @Valid BookRequestDto bookDto
     ) {
-        BookDto createdBook = bookService.register(bookDto);
+        BookResponseDto createdBook =
+                bookService.register(bookDto);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -29,27 +31,30 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BookDto>> list() {
-        List<BookDto> catalog = bookService.list();
+    public ResponseEntity<List<BookResponseDto>> list() {
+        List<BookResponseDto> catalog =
+                bookService.list();
 
         return ResponseEntity.ok(catalog);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BookDto> getById(
+    public ResponseEntity<BookResponseDto> getById(
             @PathVariable String id
     ) {
-        BookDto book = bookService.getById(id);
+        BookResponseDto book =
+                bookService.getById(id);
 
         return ResponseEntity.ok(book);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BookDto> update(
+    public ResponseEntity<BookResponseDto> update(
             @PathVariable String id,
-            @RequestBody @Valid BookDto bookDto
+            @RequestBody @Valid BookRequestDto bookDto
     ) {
-        BookDto updatedBook = bookService.updateById(id, bookDto);
+        BookResponseDto updatedBook =
+                bookService.updateById(id, bookDto);
 
         return ResponseEntity.ok(updatedBook);
     }

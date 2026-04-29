@@ -1,6 +1,7 @@
 package com.senacsp.projetosemestral.bibliotecapessoal.adapter.persistence;
 
-import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookDto;
+import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookRequestDto;
+import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookResponseDto;
 import com.senacsp.projetosemestral.bibliotecapessoal.adapter.mapper.BookMapper;
 import com.senacsp.projetosemestral.bibliotecapessoal.adapter.persistence.repository.mongodb.BookMongoRepository;
 import com.senacsp.projetosemestral.bibliotecapessoal.adapter.persistence.repository.mongodb.CatalogManagerMongoImp;
@@ -30,12 +31,24 @@ class CatalogManagerMongoImpTest {
     @InjectMocks
     private CatalogManagerMongoImp catalogManager;
 
-    private BookDto bookDto;
+    private BookRequestDto requestDto;
+    private BookResponseDto responseDto;
     private Book book;
 
     @BeforeEach
     void setUp() {
-        bookDto = BookDto.builder()
+        requestDto = BookRequestDto.builder()
+                .titulo("The Last Kingdom")
+                .autor("Edward Stone")
+                .isbn("978-85-0000-000-0")
+                .anoPublicacao(2024)
+                .genero("Fantasy")
+                .quantidadePaginas(512)
+                .disponivel(true)
+                .build();
+
+        responseDto = BookResponseDto.builder()
+                .id("1")
                 .titulo("The Last Kingdom")
                 .autor("Edward Stone")
                 .isbn("978-85-0000-000-0")
@@ -59,35 +72,36 @@ class CatalogManagerMongoImpTest {
 
     @Test
     void shouldCatalogBook() {
-        when(bookMapper.toBook(bookDto)).thenReturn(book);
+        when(bookMapper.toBook(requestDto)).thenReturn(book);
         when(bookMongoRepository.save(book)).thenReturn(book);
-        when(bookMapper.toDto(book)).thenReturn(bookDto);
+        when(bookMapper.toResponseDto(book)).thenReturn(responseDto);
 
-        BookDto result = catalogManager.catalog(bookDto);
+        BookResponseDto result = catalogManager.catalog(requestDto);
 
         assertNotNull(result);
-        assertEquals(bookDto.getTitulo(), result.getTitulo());
+        assertEquals("1", result.getId());
+        assertEquals(requestDto.getTitulo(), result.getTitulo());
 
-        verify(bookMapper).toBook(bookDto);
+        verify(bookMapper).toBook(requestDto);
         verify(bookMongoRepository).save(book);
-        verify(bookMapper).toDto(book);
+        verify(bookMapper).toResponseDto(book);
     }
 
     @Test
     void shouldReturnCatalog() {
         List<Book> books = List.of(book);
-        List<BookDto> dtos = List.of(bookDto);
+        List<BookResponseDto> responseList = List.of(responseDto);
 
         when(bookMongoRepository.findAll()).thenReturn(books);
-        when(bookMapper.toDtoList(books)).thenReturn(dtos);
+        when(bookMapper.toResponseDtoList(books)).thenReturn(responseList);
 
-        List<BookDto> result = catalogManager.getCatalog();
+        List<BookResponseDto> result = catalogManager.getCatalog();
 
         assertEquals(1, result.size());
         assertEquals("The Last Kingdom", result.get(0).getTitulo());
 
         verify(bookMongoRepository).findAll();
-        verify(bookMapper).toDtoList(books);
+        verify(bookMapper).toResponseDtoList(books);
     }
 
     @Test
@@ -95,16 +109,16 @@ class CatalogManagerMongoImpTest {
         when(bookMongoRepository.findById("1"))
                 .thenReturn(Optional.of(book));
 
-        when(bookMapper.toDto(book))
-                .thenReturn(bookDto);
+        when(bookMapper.toResponseDto(book))
+                .thenReturn(responseDto);
 
-        BookDto result = catalogManager.getBookDetails("1");
+        BookResponseDto result = catalogManager.getBookDetails("1");
 
         assertNotNull(result);
         assertEquals("The Last Kingdom", result.getTitulo());
 
         verify(bookMongoRepository).findById("1");
-        verify(bookMapper).toDto(book);
+        verify(bookMapper).toResponseDto(book);
     }
 
     @Test
@@ -132,20 +146,22 @@ class CatalogManagerMongoImpTest {
         when(bookMongoRepository.findById("1"))
                 .thenReturn(Optional.of(book));
 
-        when(bookMongoRepository.save(any(Book.class)))
+        when(bookMongoRepository.save(book))
                 .thenReturn(book);
 
-        when(bookMapper.toDto(any(Book.class)))
-                .thenReturn(bookDto);
+        when(bookMapper.toResponseDto(book))
+                .thenReturn(responseDto);
 
-        BookDto result = catalogManager.updateInfo("1", bookDto);
+        BookResponseDto result =
+                catalogManager.updateInfo("1", requestDto);
 
         assertNotNull(result);
-        assertEquals(bookDto.getTitulo(), result.getTitulo());
+        assertEquals(responseDto.getTitulo(), result.getTitulo());
 
         verify(bookMongoRepository).findById("1");
-        verify(bookMongoRepository).save(any(Book.class));
-        verify(bookMapper).toDto(any(Book.class));
+        verify(bookMapper).updateBook(book, requestDto);
+        verify(bookMongoRepository).save(book);
+        verify(bookMapper).toResponseDto(book);
     }
 
     @Test
@@ -156,7 +172,7 @@ class CatalogManagerMongoImpTest {
         IllegalArgumentException ex =
                 assertThrows(
                         IllegalArgumentException.class,
-                        () -> catalogManager.updateInfo("1", bookDto)
+                        () -> catalogManager.updateInfo("1", requestDto)
                 );
 
         assertEquals(
@@ -170,10 +186,16 @@ class CatalogManagerMongoImpTest {
 
     @Test
     void shouldDeleteBook() {
-        doNothing().when(bookMongoRepository).deleteById("1");
+        when(bookMongoRepository.existsById("1"))
+                .thenReturn(true);
+
+        doNothing()
+                .when(bookMongoRepository)
+                .deleteById("1");
 
         catalogManager.removeFromCatalog("1");
 
+        verify(bookMongoRepository).existsById("1");
         verify(bookMongoRepository).deleteById("1");
     }
 }

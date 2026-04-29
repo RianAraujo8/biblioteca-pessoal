@@ -1,6 +1,7 @@
 package com.senacsp.projetosemestral.bibliotecapessoal.adapter.mapper;
 
-import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookDto;
+import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookRequestDto;
+import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookResponseDto;
 import com.senacsp.projetosemestral.bibliotecapessoal.domain.Book;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,14 +14,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class BookMapperTest {
 
     private BookMapper bookMapper;
-    private BookDto bookDto;
+    private BookRequestDto bookRequestDto;
     private Book book;
 
     @BeforeEach
     void setUp() {
         bookMapper = new BookMapper();
 
-        bookDto = BookDto.builder()
+        bookRequestDto = BookRequestDto.builder()
                 .titulo("The Last Kingdom")
                 .autor("Edward Stone")
                 .isbn("9781234567890")
@@ -43,17 +44,17 @@ class BookMapperTest {
     }
 
     @Test
-    void shouldConvertDtoToBook() {
-        Book mappedBook = bookMapper.toBook(bookDto);
+    void shouldConvertRequestDtoToBook() {
+        Book mappedBook = bookMapper.toBook(bookRequestDto);
 
         assertNotNull(mappedBook);
-        assertEquals(bookDto.getTitulo(), mappedBook.getTitle());
-        assertEquals(bookDto.getAutor(), mappedBook.getAuthor());
-        assertEquals(bookDto.getIsbn(), mappedBook.getIsbn());
-        assertEquals(bookDto.getAnoPublicacao(), mappedBook.getYearOfPublication());
-        assertEquals(bookDto.getGenero(), mappedBook.getGenre());
-        assertEquals(bookDto.getQuantidadePaginas(), mappedBook.getPages());
-        assertEquals(bookDto.getDisponivel(), mappedBook.getIsAvailable());
+        assertEquals(bookRequestDto.getTitulo(), mappedBook.getTitle());
+        assertEquals(bookRequestDto.getAutor(), mappedBook.getAuthor());
+        assertEquals(bookRequestDto.getIsbn(), mappedBook.getIsbn());
+        assertEquals(bookRequestDto.getAnoPublicacao(), mappedBook.getYearOfPublication());
+        assertEquals(bookRequestDto.getGenero(), mappedBook.getGenre());
+        assertEquals(bookRequestDto.getQuantidadePaginas(), mappedBook.getPages());
+        assertEquals(bookRequestDto.getDisponivel(), mappedBook.getIsAvailable());
         assertNotNull(mappedBook.getRegisterDate());
     }
 
@@ -65,14 +66,18 @@ class BookMapperTest {
                         () -> bookMapper.toBook(null)
                 );
 
-        assertEquals("dto não pode ser nulo", exception.getMessage());
+        assertEquals(
+                "BookRequestDto não pode ser nulo",
+                exception.getMessage()
+        );
     }
 
     @Test
-    void shouldConvertBookToDto() {
-        BookDto mappedDto = bookMapper.toDto(book);
+    void shouldConvertBookToResponseDto() {
+        BookResponseDto mappedDto = bookMapper.toResponseDto(book);
 
         assertNotNull(mappedDto);
+        assertEquals(book.getId(), mappedDto.getId());
         assertEquals(book.getTitle(), mappedDto.getTitulo());
         assertEquals(book.getAuthor(), mappedDto.getAutor());
         assertEquals(book.getIsbn(), mappedDto.getIsbn());
@@ -87,10 +92,13 @@ class BookMapperTest {
         IllegalArgumentException exception =
                 assertThrows(
                         IllegalArgumentException.class,
-                        () -> bookMapper.toDto(null)
+                        () -> bookMapper.toResponseDto(null)
                 );
 
-        assertEquals("book não pode ser nulo", exception.getMessage());
+        assertEquals(
+                "Book não pode ser nulo",
+                exception.getMessage()
+        );
     }
 
     @Test
@@ -103,37 +111,40 @@ class BookMapperTest {
 
     @Test
     void shouldIgnoreNullItemsWhenConvertingDtoList() {
-        List<BookDto> dtos = new ArrayList<>();
-        dtos.add(bookDto);
+        List<BookRequestDto> dtos = new ArrayList<>();
+        dtos.add(bookRequestDto);
         dtos.add(null);
 
         List<Book> books = bookMapper.toBookList(dtos);
 
         assertEquals(1, books.size());
-        assertEquals(bookDto.getTitulo(), books.get(0).getTitle());
+        assertEquals(bookRequestDto.getTitulo(), books.getFirst().getTitle());
     }
 
     @Test
     void shouldReturnEmptyListWhenBookListIsNull() {
-        List<BookDto> dtos = bookMapper.toDtoList(null);
+        List<BookResponseDto> dtos =
+                bookMapper.toResponseDtoList(null);
 
         assertNotNull(dtos);
         assertTrue(dtos.isEmpty());
     }
 
     @Test
-    void shouldConvertBookListToDtoList() {
+    void shouldConvertBookListToResponseDtoList() {
         List<Book> books = List.of(book);
 
-        List<BookDto> dtos = bookMapper.toDtoList(books);
+        List<BookResponseDto> dtos =
+                bookMapper.toResponseDtoList(books);
 
         assertEquals(1, dtos.size());
-        assertEquals(book.getTitle(), dtos.get(0).getTitulo());
+        assertEquals(book.getId(), dtos.getFirst().getId());
+        assertEquals(book.getTitle(), dtos.getFirst().getTitulo());
     }
 
     @Test
     void shouldUpdateExistingBook() {
-        BookDto newInfo = BookDto.builder()
+        BookRequestDto newInfo = BookRequestDto.builder()
                 .titulo("The Last Kingdom - Revised Edition")
                 .autor("Edward Stone Jr.")
                 .isbn("9780987654321")
@@ -151,7 +162,7 @@ class BookMapperTest {
         assertEquals(newInfo.getAnoPublicacao(), book.getYearOfPublication());
         assertEquals(newInfo.getGenero(), book.getGenre());
         assertEquals(newInfo.getQuantidadePaginas(), book.getPages());
-        assertEquals(newInfo.getDisponivel(), book.getIsAvailable());
+        assertFalse(book.getIsAvailable());
     }
 
     @Test
@@ -159,9 +170,12 @@ class BookMapperTest {
         IllegalArgumentException exception =
                 assertThrows(
                         IllegalArgumentException.class,
-                        () -> bookMapper.updateBook(null, bookDto)
+                        () -> bookMapper.updateBook(null, bookRequestDto)
                 );
 
-        assertEquals("dto ou book não pode ser nulo", exception.getMessage());
+        assertEquals(
+                "Book ou BookRequestDto não pode ser nulo",
+                exception.getMessage()
+        );
     }
 }

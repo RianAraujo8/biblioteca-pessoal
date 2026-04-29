@@ -11,17 +11,17 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class BookDtoValidationTest {
+class BookRequestDtoTest {
 
     private Validator validator;
-    private BookDto validBookDto;
+    private BookRequestDto validBookDto;
 
     @BeforeEach
     void setUp() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
 
-        validBookDto = BookDto.builder()
+        validBookDto = BookRequestDto.builder()
                 .titulo("The Last Kingdom")
                 .autor("Edward Stone")
                 .isbn("978-85-0000-000-0")
@@ -34,7 +34,7 @@ class BookDtoValidationTest {
 
     @Test
     void shouldPassValidationWhenDtoIsValid() {
-        Set<ConstraintViolation<BookDto>> violations =
+        Set<ConstraintViolation<BookRequestDto>> violations =
                 validator.validate(validBookDto);
 
         assertTrue(violations.isEmpty());
@@ -44,7 +44,7 @@ class BookDtoValidationTest {
     void shouldFailWhenTituloIsNull() {
         validBookDto.setTitulo(null);
 
-        Set<ConstraintViolation<BookDto>> violations =
+        Set<ConstraintViolation<BookRequestDto>> violations =
                 validator.validate(validBookDto);
 
         assertEquals(1, violations.size());
@@ -55,7 +55,7 @@ class BookDtoValidationTest {
     void shouldFailWhenTituloIsBlank() {
         validBookDto.setTitulo("   ");
 
-        Set<ConstraintViolation<BookDto>> violations =
+        Set<ConstraintViolation<BookRequestDto>> violations =
                 validator.validate(validBookDto);
 
         assertEquals(1, violations.size());
@@ -66,7 +66,7 @@ class BookDtoValidationTest {
     void shouldFailWhenAutorIsNull() {
         validBookDto.setAutor(null);
 
-        Set<ConstraintViolation<BookDto>> violations =
+        Set<ConstraintViolation<BookRequestDto>> violations =
                 validator.validate(validBookDto);
 
         assertEquals(1, violations.size());
@@ -77,7 +77,7 @@ class BookDtoValidationTest {
     void shouldFailWhenAutorIsBlank() {
         validBookDto.setAutor("");
 
-        Set<ConstraintViolation<BookDto>> violations =
+        Set<ConstraintViolation<BookRequestDto>> violations =
                 validator.validate(validBookDto);
 
         assertEquals(1, violations.size());
@@ -88,7 +88,7 @@ class BookDtoValidationTest {
     void shouldFailWhenAnoPublicacaoIsNull() {
         validBookDto.setAnoPublicacao(null);
 
-        Set<ConstraintViolation<BookDto>> violations =
+        Set<ConstraintViolation<BookRequestDto>> violations =
                 validator.validate(validBookDto);
 
         assertEquals(1, violations.size());
@@ -99,7 +99,7 @@ class BookDtoValidationTest {
     void shouldFailWhenAnoPublicacaoIsZero() {
         validBookDto.setAnoPublicacao(0);
 
-        Set<ConstraintViolation<BookDto>> violations =
+        Set<ConstraintViolation<BookRequestDto>> violations =
                 validator.validate(validBookDto);
 
         assertEquals(1, violations.size());
@@ -113,7 +113,7 @@ class BookDtoValidationTest {
     void shouldFailWhenAnoPublicacaoIsNegative() {
         validBookDto.setAnoPublicacao(-1995);
 
-        Set<ConstraintViolation<BookDto>> violations =
+        Set<ConstraintViolation<BookRequestDto>> violations =
                 validator.validate(validBookDto);
 
         assertEquals(1, violations.size());

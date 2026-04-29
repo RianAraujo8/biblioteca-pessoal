@@ -1,6 +1,7 @@
 package com.senacsp.projetosemestral.bibliotecapessoal.adapter.persistence.repository.mongodb;
 
-import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookDto;
+import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookRequestDto;
+import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookResponseDto;
 import com.senacsp.projetosemestral.bibliotecapessoal.adapter.mapper.BookMapper;
 import com.senacsp.projetosemestral.bibliotecapessoal.aplication.library_data_manager.CatalogManager;
 import com.senacsp.projetosemestral.bibliotecapessoal.domain.Book;
@@ -17,57 +18,61 @@ public class CatalogManagerMongoImp implements CatalogManager {
     private final BookMongoRepository bookMongoRepository;
 
     @Override
-    public BookDto catalog(BookDto dto) {
+    public BookResponseDto catalog(BookRequestDto dto) {
         Book newBook = bookMapper.toBook(dto);
         Book savedBook = bookMongoRepository.save(newBook);
 
-        BookDto savedBookInfo = bookMapper.toDto(savedBook);
-        return savedBookInfo;
+        return bookMapper.toResponseDto(savedBook);
     }
 
     @Override
-    public List<BookDto> getCatalog() {
+    public List<BookResponseDto> getCatalog() {
         List<Book> catalog = bookMongoRepository.findAll();
 
-        List<BookDto> dtoCatalog = bookMapper.toDtoList(catalog);
-        return dtoCatalog;
+        return bookMapper.toResponseDtoList(catalog);
     }
 
     @Override
-    public BookDto getBookDetails(String id) {
-        Book book = bookMongoRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("não há livros catalogados com id "+id));
+    public BookResponseDto getBookDetails(String id) {
+        Book book = bookMongoRepository.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "não há livros catalogados com id " + id));
 
-        BookDto bookDto = bookMapper.toDto(book);
-        return bookDto;
+        return bookMapper.toResponseDto(book);
     }
 
     @Override
-    public BookDto updateInfo(String id, BookDto dto) {
+    public BookResponseDto updateInfo(String id, BookRequestDto dto) {
         Book bookToUpdate = bookMongoRepository.findById(id)
                 .orElseThrow(() ->
                         new IllegalArgumentException(
                                 "não há livros catalogados com id " + id));
 
-        bookToUpdate.setTitle(dto.getTitulo());
-        bookToUpdate.setAuthor(dto.getAutor());
-        bookToUpdate.setIsbn(dto.getIsbn());
-        bookToUpdate.setYearOfPublication(dto.getAnoPublicacao());
-        bookToUpdate.setGenre(dto.getGenero());
-        bookToUpdate.setPages(dto.getQuantidadePaginas());
-        bookToUpdate.setIsAvailable(dto.getDisponivel());
+        bookMapper.updateBook(bookToUpdate, dto);
 
         Book updatedBook = bookMongoRepository.save(bookToUpdate);
 
-        return bookMapper.toDto(updatedBook);
+        return bookMapper.toResponseDto(updatedBook);
     }
 
     @Override
     public void removeFromCatalog(String id) {
+        if (!bookMongoRepository.existsById(id)) {
+            throw new IllegalArgumentException(
+                    "não há livros catalogados com id " + id);
+        }
+
         bookMongoRepository.deleteById(id);
     }
 
     @Override
     public boolean isAvailable(String id) {
-        return true;
+        Book book = bookMongoRepository.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "não há livros catalogados com id " + id));
+
+        return book.getIsAvailable();
     }
 }

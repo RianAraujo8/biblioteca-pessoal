@@ -1,6 +1,7 @@
 package com.senacsp.projetosemestral.bibliotecapessoal.adapter.mapper;
 
-import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookDto;
+import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookRequestDto;
+import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookResponseDto;
 import com.senacsp.projetosemestral.bibliotecapessoal.domain.Book;
 import org.springframework.stereotype.Component;
 
@@ -11,8 +12,10 @@ import java.util.Objects;
 @Component
 public class BookMapper {
 
-    public Book toBook(BookDto dto) {
-        if (dto == null) throw new IllegalArgumentException("dto não pode ser nulo");
+    public Book toBook(BookRequestDto dto) {
+        if (dto == null) {
+            throw new IllegalArgumentException("BookRequestDto não pode ser nulo");
+        }
 
         return Book.builder()
                 .title(dto.getTitulo())
@@ -21,27 +24,29 @@ public class BookMapper {
                 .yearOfPublication(dto.getAnoPublicacao())
                 .genre(dto.getGenero())
                 .pages(dto.getQuantidadePaginas())
-                .isAvailable(dto.getDisponivel())
+                .isAvailable(true)
                 .registerDate(LocalDateTime.now())
                 .build();
     }
 
-    public BookDto toDto(Book book) {
-        if (book == null) throw new IllegalArgumentException("book não pode ser nulo");
+    public BookResponseDto toResponseDto(Book book) {
+        if (book == null) {
+            throw new IllegalArgumentException("Book não pode ser nulo");
+        }
 
-        BookDto dto = new BookDto();
-        dto.setTitulo(book.getTitle());
-        dto.setAutor(book.getAuthor());
-        dto.setIsbn(book.getIsbn());
-        dto.setAnoPublicacao(book.getYearOfPublication());
-        dto.setGenero(book.getGenre());
-        dto.setQuantidadePaginas(book.getPages());
-        dto.setDisponivel(book.getIsAvailable());
-
-        return dto;
+        return BookResponseDto.builder()
+                .id(book.getId())
+                .titulo(book.getTitle())
+                .autor(book.getAuthor())
+                .isbn(book.getIsbn())
+                .anoPublicacao(book.getYearOfPublication())
+                .genero(book.getGenre())
+                .quantidadePaginas(book.getPages())
+                .disponivel(book.getIsAvailable())
+                .build();
     }
 
-    public List<Book> toBookList(List<BookDto> dtos) {
+    public List<Book> toBookList(List<BookRequestDto> dtos) {
         if (dtos == null) {
             return List.of();
         }
@@ -52,21 +57,22 @@ public class BookMapper {
                 .toList();
     }
 
-
-    public List<BookDto> toDtoList(List<Book> entities) {
-        if (entities == null) {
+    public List<BookResponseDto> toResponseDtoList(List<Book> books) {
+        if (books == null) {
             return List.of();
         }
 
-        return entities.stream()
+        return books.stream()
                 .filter(Objects::nonNull)
-                .map(this::toDto)
+                .map(this::toResponseDto)
                 .toList();
     }
 
-
-    public void updateBook(Book book, BookDto dto) {
-        if (book == null || dto == null) throw new IllegalArgumentException("dto ou book não pode ser nulo");;
+    public void updateBook(Book book, BookRequestDto dto) {
+        if (book == null || dto == null) {
+            throw new IllegalArgumentException(
+                    "Book ou BookRequestDto não pode ser nulo");
+        }
 
         book.setTitle(dto.getTitulo());
         book.setAuthor(dto.getAutor());

@@ -1,17 +1,19 @@
 package com.senacsp.projetosemestral.bibliotecapessoal.aplication.library_data_manager;
 
-import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookDto;
+import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookRequestDto;
+import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookResponseDto;
 
 import java.util.List;
 
 public interface CatalogManager {
-    BookDto catalog(BookDto dto);
 
-    List<BookDto> getCatalog();
+    BookResponseDto catalog(BookRequestDto dto);
 
-    BookDto getBookDetails(String id);
+    List<BookResponseDto> getCatalog();
 
-    BookDto updateInfo(String id, BookDto dto);
+    BookResponseDto getBookDetails(String id);
+
+    BookResponseDto updateInfo(String id, BookRequestDto dto);
 
     void removeFromCatalog(String id);
 

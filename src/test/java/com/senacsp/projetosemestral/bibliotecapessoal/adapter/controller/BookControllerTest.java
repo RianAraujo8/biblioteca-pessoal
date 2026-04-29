@@ -1,12 +1,11 @@
 package com.senacsp.projetosemestral.bibliotecapessoal.adapter.controller;
 
-
-import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookDto;
+import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookRequestDto;
+import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookResponseDto;
 import com.senacsp.projetosemestral.bibliotecapessoal.aplication.service.BookService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
@@ -25,7 +24,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
 @WebMvcTest(BookController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class BookControllerTest {
@@ -39,11 +37,22 @@ class BookControllerTest {
     @MockitoBean
     private BookService bookService;
 
-    private BookDto bookDto;
+    private BookRequestDto requestDto;
+    private BookResponseDto responseDto;
 
     @BeforeEach
     void setUp() {
-        bookDto = BookDto.builder()
+        requestDto = BookRequestDto.builder()
+                .titulo("The Last Kingdom")
+                .autor("Edward Stone")
+                .isbn("978-85-0000-000-0")
+                .anoPublicacao(2024)
+                .genero("Fantasy")
+                .quantidadePaginas(512)
+                .build();
+
+        responseDto = BookResponseDto.builder()
+                .id("abc123")
                 .titulo("The Last Kingdom")
                 .autor("Edward Stone")
                 .isbn("978-85-0000-000-0")
@@ -56,33 +65,35 @@ class BookControllerTest {
 
     @Test
     void shouldRegisterBook() throws Exception {
-        when(bookService.register(any(BookDto.class)))
-                .thenReturn(bookDto);
+        when(bookService.register(any(BookRequestDto.class)))
+                .thenReturn(responseDto);
 
         mockMvc.perform(post("/biblioteca-pessoal/v1/livros")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(bookDto)))
+                        .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value("abc123"))
                 .andExpect(jsonPath("$.titulo").value("The Last Kingdom"))
                 .andExpect(jsonPath("$.autor").value("Edward Stone"))
                 .andExpect(jsonPath("$.isbn").value("978-85-0000-000-0"))
-                .andExpect(jsonPath("$.anoPublicacao").value(2024))
+                .andExpect(jsonPath("$.ano_publicacao").value(2024))
                 .andExpect(jsonPath("$.genero").value("Fantasy"))
-                .andExpect(jsonPath("$.quantidadePaginas").value(512))
+                .andExpect(jsonPath("$.quantidade_paginas").value(512))
                 .andExpect(jsonPath("$.disponivel").value(true));
 
-        verify(bookService).register(any(BookDto.class));
+        verify(bookService).register(any(BookRequestDto.class));
     }
 
     @Test
     void shouldReturnCatalog() throws Exception {
         when(bookService.list())
-                .thenReturn(List.of(bookDto));
+                .thenReturn(List.of(responseDto));
 
         mockMvc.perform(get("/biblioteca-pessoal/v1/livros"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[0].id").value("abc123"))
                 .andExpect(jsonPath("$[0].titulo").value("The Last Kingdom"))
                 .andExpect(jsonPath("$[0].autor").value("Edward Stone"));
 
@@ -92,11 +103,12 @@ class BookControllerTest {
     @Test
     void shouldReturnBookById() throws Exception {
         when(bookService.getById("1"))
-                .thenReturn(bookDto);
+                .thenReturn(responseDto);
 
         mockMvc.perform(get("/biblioteca-pessoal/v1/livros/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value("abc123"))
                 .andExpect(jsonPath("$.titulo").value("The Last Kingdom"))
                 .andExpect(jsonPath("$.autor").value("Edward Stone"));
 
@@ -105,18 +117,19 @@ class BookControllerTest {
 
     @Test
     void shouldUpdateBook() throws Exception {
-        when(bookService.updateById(eq("1"), any(BookDto.class)))
-                .thenReturn(bookDto);
+        when(bookService.updateById(eq("1"), any(BookRequestDto.class)))
+                .thenReturn(responseDto);
 
         mockMvc.perform(put("/biblioteca-pessoal/v1/livros/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(bookDto)))
+                        .content(objectMapper.writeValueAsString(requestDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value("abc123"))
                 .andExpect(jsonPath("$.titulo").value("The Last Kingdom"))
                 .andExpect(jsonPath("$.autor").value("Edward Stone"));
 
-        verify(bookService).updateById(eq("1"), any(BookDto.class));
+        verify(bookService).updateById(eq("1"), any(BookRequestDto.class));
     }
 
     @Test
@@ -132,7 +145,7 @@ class BookControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenBodyIsInvalid() throws Exception {
-        BookDto invalidDto = BookDto.builder()
+        BookRequestDto invalidDto = BookRequestDto.builder()
                 .titulo("")
                 .autor("")
                 .anoPublicacao(0)
