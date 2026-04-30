@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,9 @@ class MembershipManagerMongoImpTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private MembershipManagerMongoImp membershipManager;
@@ -69,6 +73,7 @@ class MembershipManagerMongoImpTest {
         when(userMapper.toUser(requestDto)).thenReturn(user);
         when(userMongoRepository.save(user)).thenReturn(user);
         when(userMapper.toResponseDto(user)).thenReturn(responseDto);
+        when(passwordEncoder.encode(requestDto.getPassword())).thenReturn(requestDto.getPassword());
 
         UserResponseDto result = membershipManager.admit(requestDto);
 
@@ -138,6 +143,9 @@ class MembershipManagerMongoImpTest {
 
         when(userMongoRepository.save(user))
                 .thenReturn(user);
+
+        when(passwordEncoder.encode(requestDto.getPassword()))
+                .thenReturn(requestDto.getPassword());
 
         when(userMapper.toResponseDto(user))
                 .thenReturn(responseDto);

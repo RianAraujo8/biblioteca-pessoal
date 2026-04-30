@@ -6,6 +6,7 @@ import com.senacsp.projetosemestral.bibliotecapessoal.adapter.mapper.UserMapper;
 import com.senacsp.projetosemestral.bibliotecapessoal.aplication.library_data_manager.MembershipManager;
 import com.senacsp.projetosemestral.bibliotecapessoal.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -16,9 +17,12 @@ public class MembershipManagerMongoImp implements MembershipManager {
 
     private final UserMongoRepository userMongoRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponseDto admit(UserRequestDto dto) {
+        String encodedPassword = passwordEncoder.encode(dto.getPassword());
+        dto.setPassword(encodedPassword);
         User newUser = userMapper.toUser(dto);
         User savedUser = userMongoRepository.save(newUser);
 
@@ -48,6 +52,10 @@ public class MembershipManagerMongoImp implements MembershipManager {
                 .orElseThrow(() ->
                         new IllegalArgumentException(
                                 "não há membro cadastrado com id " + id));
+
+        String encodedPassword = passwordEncoder.encode(dto.getPassword());
+
+        dto.setPassword(encodedPassword);
 
         userMapper.updateUser(userToUpdate, dto);
 

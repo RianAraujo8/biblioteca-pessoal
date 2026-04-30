@@ -1,10 +1,8 @@
-package com.senacsp.projetosemestral.bibliotecapessoal.adapter.persistence;
+package com.senacsp.projetosemestral.bibliotecapessoal.adapter.persistence.repository.mongodb;
 
 import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookRequestDto;
 import com.senacsp.projetosemestral.bibliotecapessoal.adapter.dto.BookResponseDto;
 import com.senacsp.projetosemestral.bibliotecapessoal.adapter.mapper.BookMapper;
-import com.senacsp.projetosemestral.bibliotecapessoal.adapter.persistence.repository.mongodb.BookMongoRepository;
-import com.senacsp.projetosemestral.bibliotecapessoal.adapter.persistence.repository.mongodb.CatalogManagerMongoImp;
 import com.senacsp.projetosemestral.bibliotecapessoal.domain.Book;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
