@@ -1,0 +1,55 @@
+API Biblioteca Pessoal
+
+
+	INTRODUÇÃO
+	
+	O produto tem o objetivo de automatizar o gerênciamento de usuários e do catálogo de livros de uma biblioteca pessoal.
+Ele irá conter o crud básico das entidades e controle de acesso vai login.
+
+
+	SOBRE A ARQUITETURA DA API
+	
+	O desenvolvimento seguiu o modelo exagonal de arquitetura para que a API possa ser atualizada e expandida sem a necessidade
+de interferência agressiva nas classes existentes.
+
+
+	A api é dividida entre:
+		
+		- controladores (fazem a interface entre o cliente e o servidor);
+		
+		- DTOs (carregam os dados das requisições e das respostas do catalago e usuários para dentro e fora da API);
+		
+		- services (realizam o crud de catálogo e usuários e podem ser expandidos futuramente);
+		
+		- gerenciadores de dados da bilioteca (implementações que encapsulam as funções dos repositórios, permitindo futura migração de banco de dados
+		apartir do princípio de inversão de dependência;
+		
+		- mapeadores (fazem o mapeamento entre entidades Livro e Usuário e seus respectivos DTOs);
+		
+		- filtro de segurança (exige autenticação em todos os end-poits exceto cadastro de usuários);
+		
+		- entidades de domínio (representam as informações de livros e usuários da biblioteca);
+		
+		- testes unitários (aseguram manutenção e de que todas as partes da api funcionem como foram planejadas);
+		
+		- testes de integração (aseguram mautenção e de que o conjunto das partes da api funcione como foi planejado);
+		
+		
+	SOBRE AS TECNOLOGIAS
+
+		A produto contém infraestrutura que o torna seguro e desacoplado:
+		
+			- Spring Security (filtros de segurança que intercepta toda requisição à API);
+			
+			- Bean Validation (valida todas as entradas de dados antes das informações serem processadas pelos services,
+			separando responsabilidades, enxigando a classe de serviço e facilitando os testes);
+			
+			- Mockito (permite isolar o mecânismo da classe de suas dependências externas para testar cada classe
+			separadamente, seus argumentos, chamadas e respostas);
+			
+			- Test Containers (permite que os testes de integração sejam realizados com um banco de dados real igual ao utilizado pela api
+			mas apenas no contexto de testes. Isso permite testar em um cenário idêntico ao de desenvolvimento sem afetar o banco de dados da biblioteca);
+			
+			- MockMvc (permite isolar os controllers par atestar apenas seu comportamento);
+			
+			- MongoDB (banco conveniênte por guardar dados em documentos não relacionais e que não exige desenvolvimento complexo quanto comparado ao JPA Hibernate);
