@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Baixar código
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Configurar Java
         uses: actions/setup-java@v4
@@ -22,5 +24,14 @@ jobs:
           java-version: 21
           cache: maven
 
-      - name: Rodar build e testes
+      - name: Build + testes + JaCoCo
         run: mvn clean verify
+
+      - name: SonarQube Cloud Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: >
+          mvn sonar:sonar
+          -Dsonar.projectKey=RianAraujo8_biblioteca-pessoal
+          -Dsonar.organization=rianaraujo8
+          -Dsonar.host.url=https://sonarcloud.io
